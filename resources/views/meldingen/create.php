@@ -1,54 +1,54 @@
-<?php require_once __DIR__ . '/../../../config/config.php'; ?>
-<!doctype html>
-<html lang="nl">
+<?php
 
-<head>
-    <title>StoringApp / Meldingen / Nieuw</title>
-    <?php require_once __DIR__ . '/../components/head.php'; ?>
-</head>
+//Variabelen vullen
+$attractie = $_POST['attractie'] ?? '';
 
-<body>
+if (is_numeric($_POST['capaciteit'])) {
+    $capaciteit = $_POST['capaciteit'];
 
-    <?php require_once __DIR__ . '/../components/header.php'; ?>
+} else {
+    $capaciteit = 0;
+}
 
-    <div class="container">
-        <h1>Nieuwe melding</h1>
+$melder = $_POST['melder'] ?? '';
+$overige_info = $_POST['overige_info'] ?? '';
 
-        <?php if (($_GET['error'] ?? '') === 'capaciteit'): ?>
-            <div class="msg">Vul een geheel getal tussen 0 en 2147483647 in voor de capaciteit.</div>
-        <?php endif; ?>
+$allowed_types = ['achtbaan', 'draaiend', 'water', 'overig'];
 
-        <form action="<?php echo $base_url; ?>/app/Http/Controllers/meldingenController.php" method="POST">
 
-            <div class="form-group">
-                <label for="attractie">Naam attractie:</label>
-                <input type="text" name="attractie" id="attractie" class="form-input">
-            </div>
-            <div class="form-group">
-                <label for="type">Type</label>
-                <!-- hier komt een dropdown -->
-                 <select id="type" name="type" required>
-  <option value="">-- kies een type --</option>
-  <option value="achtbaan">Achtbaan</option>
-  <option value="draaiend">Draaiende attractie</option>
-  <option value="water">Waterattractie</option>
-  <option value="overig">Overig</option>
-</select>
-            </div>
-            <div class="form-group">
-                <label for="capaciteit">Capaciteit p/uur:</label>
-                <input type="number" min="0" max="2147483647" step="1" name="capaciteit" id="capaciteit" class="form-input">
-            </div>
-            <div class="form-group">
-                <label for="melder">Naam melder:</label>
-                <input type="text" name="melder" id="melder" class="form-input">
-            </div>
 
-            <input type="submit" value="Verstuur melding">
+if (in_array($_POST['type'], $allowed_types)) {
+    $type = $_POST['type'];
+} else {
+    $type = '';
+}
+$type = $_POST['type'] ?? '';
 
-        </form>
-    </div>
 
-</body>
 
-</html>
+//1. Verbinding
+require_once '../../../config/conn.php';
+
+//2. Query
+$query = "
+
+            INSERT INTO meldingen
+                (melder,capaciteit,attractie,type,overige_info)
+            VALUES
+                (:melder,:capaciteit,:attractie,:type,:overige_info)
+";
+//3. Prepare
+$statement = $conn->prepare($query);
+
+//4. Execute
+
+$statement->execute([
+    ":melder"     => $melder,
+    ":capaciteit" => $capaciteit,
+    ":attractie"  => $attractie,
+    ":type"       => $type,
+    ":overige_info" => $overige_info
+]);
+
+header('Location:' . $base_url . '/resources/views/meldingen/index.php?msg=Je melding is opgeslagen');
+exit;
