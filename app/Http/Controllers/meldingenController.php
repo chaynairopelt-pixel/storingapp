@@ -1,54 +1,125 @@
 <?php
  
-//Variabelen vullen
-$attractie = $_POST['attractie'] ?? '';
+$action = $_POST['action'] ?? '';
  
-if (is_numeric($_POST['capaciteit'])) {
-    $capaciteit = $_POST['capaciteit'];
+if ($action == 'create') {
+    //Variabelen vullen
+    $attractie = $_POST['attractie'] ?? '';
  
-} else {
-    $capaciteit = 0;
-}
+    if (is_numeric($_POST['capaciteit'])) {
+        $capaciteit = $_POST['capaciteit'];
+    } else {
+        $capaciteit = 0;
+    }
  
-$melder = $_POST['melder'] ?? '';
-$overige_info = $_POST['overige_info'] ?? '';
+    $melder = $_POST['melder'] ?? '';
  
-$allowed_types = ['achtbaan', 'draaiend', 'water', 'overig'];
+    $allowed_types = [
+        "achtbaan",
+        "draaiend",
+        "water",
+        "overig"
+    ];
  
+    if (in_array($_POST['type'], $allowed_types, true)) {
+        $type = $_POST['type'];
+    } else {
+        $type = "";
+    }
  
+    $overig = $_POST["overig"] ?? '';
  
-if (in_array($_POST['type'], $allowed_types)) {
-    $type = $_POST['type'];
-} else {
-    $type = '';
-}
-$type = $_POST['type'] ?? '';
+    //1. Verbinding
+    require_once '../../../config/conn.php';
  
- 
- 
-//1. Verbinding
-require_once '../../../config/conn.php';
- 
-//2. Query
-$query = "
+    //2. Query
+    $query = "
  
             INSERT INTO meldingen
-                (melder,capaciteit,attractie,type,overige_info)
+                (melder, capaciteit, attractie, type, overige_info)
             VALUES
-                (:melder,:capaciteit,:attractie,:type,:overige_info)
+                (:melder, :capaciteit, :attractie, :type, :overig)
 ";
-//3. Prepare
-$statement = $conn->prepare($query);
  
-//4. Execute
+    //3. Prepare
+    $statement = $conn->prepare($query);
  
-$statement->execute([
-    ":melder"     => $melder,
-    ":capaciteit" => $capaciteit,
-    ":attractie"  => $attractie,
-    ":type"       => $type,
-    ":overige_info" => $overige_info
-]);
+    //4. Execute
+    $statement->execute([
+        ":melder" => $melder,
+        ":capaciteit" => $capaciteit,
+        ":attractie" => $attractie,
+        ":type" => $type,
+        ":overig" => $overig
+    ]);
  
-header('Location:' . $base_url . '/resources/views/meldingen/index.php?msg=Je melding is opgeslagen');
-exit;
+    header('Location:' . $base_url . '/resources/views/meldingen/index.php?msg=Je melding is opgeslagen');
+    exit;
+}
+ 
+if ($action == 'edit') {
+    //Variabelen vullen
+   if (is_numeric($_POST['id'])) {
+        $id = $_POST['id'];
+   } else {
+    echo "Je hebt geen geldig id meegegeven";
+    exit();
+   }
+ 
+    $attractie = $_POST['attractie'] ?? '';
+ 
+    if (is_numeric($_POST['capaciteit'])) {
+        $capaciteit = $_POST['capaciteit'];
+    } else {
+        $capaciteit = 0;
+    }
+ 
+    $melder = $_POST['melder'] ?? '';
+ 
+    // $allowed_types = [
+    //     "achtbaan",
+    //     "draaiend",
+    //     "water",
+    //     "overig"
+    // ];
+ 
+    // if (in_array($_POST['type'], $allowed_types, true)) {
+    //     $type = $_POST['type'];
+    // } else {
+    //     $type = "";
+    // }
+ 
+    $overig = $_POST["overig"] ?? '';
+ 
+    //1. Verbinding
+    require_once '../../../config/conn.php';
+ 
+    //2. Query
+    $query = "
+ 
+            UPDATE meldingen
+            SET
+                attractie = :attractie,
+                capaciteit = :capaciteit,
+                melder = :melder,
+                overige_info = :overig
+            WHERE
+                id = :id
+    ";
+ 
+    //3. Prepare
+    $statement = $conn->prepare($query);
+ 
+    //4. Execute
+    $statement->execute([
+        ":melder" => $melder,
+        ":capaciteit" => $capaciteit,
+        ":attractie" => $attractie,
+        // ":type" => $type,
+        ":overig" => $overig,
+        ":id" => $id
+    ]);
+ 
+    header('Location:' . $base_url . '/resources/views/meldingen/index.php?msg=Je melding is bewerkt');
+    exit;
+}

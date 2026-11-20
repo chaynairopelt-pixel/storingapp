@@ -19,29 +19,29 @@
         <?php endif; ?>
 
         <form action="<?php echo $base_url; ?>/app/Http/Controllers/meldingenController.php" method="POST">
-
+<input type="hidden" name="action" value="create">
             <div class="form-group">
                 <label for="attractie">Naam attractie:</label>
-                <input type="text" name="attractie" id="attractie" class="form-input">
+                <input type="text" name="attractie" id="attractie" class="form-input" required>
             </div>
             <div class="form-group">
                 <label for="type">Type</label>
                 <!-- hier komt een dropdown -->
-                 <select id="type" name="type" required>
-  <option value="">-- kies een type --</option>
-  <option value="achtbaan">Achtbaan</option>
-  <option value="draaiend">Draaiende attractie</option>
-  <option value="water">Waterattractie</option>
-  <option value="overig">Overig</option>
-</select>
+                <select id="type" name="type" required>
+                    <option value="">-- kies een type --</option>
+                    <option value="achtbaan">Achtbaan</option>
+                    <option value="draaiend">Draaiende attractie</option>
+                    <option value="water">Waterattractie</option>
+                    <option value="overig">Overig</option>
+                </select>
             </div>
             <div class="form-group">
                 <label for="capaciteit">Capaciteit p/uur:</label>
-                <input type="number" min="0" max="2147483647" step="1" name="capaciteit" id="capaciteit" class="form-input">
+                <input type="number" min="0" max="2147483647" step="1" name="capaciteit" id="capaciteit" class="form-input" required>
             </div>
             <div class="form-group">
                 <label for="melder">Naam melder:</label>
-                <input type="text" name="melder" id="melder" class="form-input">
+                <input type="text" name="melder" id="melder" class="form-input" required>
             </div>
             <div class="form-group">
                 <label for="overige_info">Extra informatie:</label>
